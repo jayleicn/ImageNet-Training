@@ -7,7 +7,8 @@ local DataProvider = require 'DataProvider'
 local config = require 'Config'
 
 -------------------------------Settings----------------------------------------------
--- rescale the image without change its aspect ratio, the final ouput is a 3*H*W, min(H, W) = config.ImageMinSide
+-- rescale the image without change its aspect ratio, the final ouput is a 3*H*W, min(H, W) = config.ImageMinSide＝256
+-- In this part, the image data itself is only rescaled to have a min-side=256, aspect ratio stay the same, no crops here.
 local PreProcess = function(Img)
     local im = image.scale(Img, '^' .. config.ImageMinSide) --minimum side of ImageMinSide
 
