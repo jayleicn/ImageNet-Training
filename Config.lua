@@ -26,6 +26,6 @@ return
 
 -- ImageNetClasses -- Lua Table
 -- ClassNum2Wnid    {1:n01972223, 2:n02234243, ...}
--- Wnid2ClassNum    nil, 
+-- Wnid2ClassNum    {n01972223:1, n02234243:2, ...}
 -- Description
 -- ClassName
