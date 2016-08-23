@@ -68,8 +68,8 @@ function LMDBFromFilenames(filenamesProvider,env)
         local filename = filenamesProvider:getItem(i)  --filename is the image full path
         local data = {Data = LoadImgData(filename), Name = NameFile(filename)} --image itself and its name as one entry
 
-        cursor:put(config.Key(i),data, lmdb.C.MDB_NODUPDATA)  --config.Key(i) generate a formated stringed_number "
-        if i % 1000 == 0 then
+        cursor:put(config.Key(i),data, lmdb.C.MDB_NODUPDATA)  --config.Key(i) generate a formated stringed_number %07d
+        if i % 1000 == 0 then  --store to disk every 1000 images
             txn:commit()
             print(env:stat())
             collectgarbage()
@@ -78,23 +78,24 @@ function LMDBFromFilenames(filenamesProvider,env)
         end
         xlua.progress(i,filenamesProvider:size())
     end
-    txn:commit()
+    txn:commit()  -- store the rest of the data entry
     env:close()
 
 end
 
-
+--DataProvider.
 local TrainingFiles = DataProvider.FileSearcher{
-    Name = 'TrainingFilenames',
-    CachePrefix = config.TRAINING_DIR,
+    Name = 'TrainingFilenames',  --name of container
+    CachePrefix = config.TRAINING_DIR,  -- where to the LMDB located
     MaxNumItems = 1e8,
-    CacheFiles = true,
-    PathList = {config.TRAINING_PATH},
-    SubFolders = true,
-    Verbose = true
+    CacheFiles = true,  -- cache data into files
+    PathList = {config.TRAINING_PATH},  -- where the images located  --!!! Maybe useful for me !!!
+    SubFolders = true,  -- including images in the subfolders
+    Verbose = true  --display msg
 }
+
 local ValidationFiles = DataProvider.FileSearcher{
-    Name = 'ValidationFilenames',
+    Name = 'ValidationFilenames', 
     CachePrefix = config.VALIDATION_DIR,
     MaxNumItems = 1e8,
     PathList = {config.VALIDATION_PATH},
@@ -102,8 +103,8 @@ local ValidationFiles = DataProvider.FileSearcher{
 }
 
 local TrainDB = lmdb.env{
-    Path = config.TRAINING_DIR,
-    Name = 'TrainDB'
+    Path = config.TRAINING_DIR,  -- LMDB location
+    Name = 'TrainDB' -- LMDB name
 }
 
 local ValDB = lmdb.env{
