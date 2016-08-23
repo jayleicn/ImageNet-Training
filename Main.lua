@@ -1,6 +1,6 @@
 require 'torch'
 require 'optim'
-require 'pl'
+require 'pl'  --https://github.com/stevedonovan/Penlight
 require 'eladtools'
 require 'trepl'
 local DataProvider = require 'DataProvider'
@@ -61,6 +61,7 @@ end
 
 ----------------------------------------------------------------------
 local config = require 'Config'
+
 
 -- Model + Loss:
 local model = require(opt.network)
