@@ -8,14 +8,16 @@ local config = require 'Config'
 
 function ExtractFromLMDBTrain(data)
     require 'image'
+    --
     local reSample = function(sampledImg)
         local sizeImg = sampledImg:size()
-        local szx = torch.random(math.ceil(sizeImg[3]/4))
-        local szy = torch.random(math.ceil(sizeImg[2]/4))
+        local szx = torch.random(math.ceil(sizeImg[3]/4)) -- width
+        local szy = torch.random(math.ceil(sizeImg[2]/4)) -- height
         local startx = torch.random(szx)
         local starty = torch.random(szy)
         return image.scale(sampledImg:narrow(2,starty,sizeImg[2]-szy):narrow(3,startx,sizeImg[3]-szx),sizeImg[3],sizeImg[2])
     end
+    
     local rotate = function(angleRange)
         local applyRot = function(Data)
             local angle = torch.randn(1)[1]*angleRange
@@ -24,9 +26,11 @@ function ExtractFromLMDBTrain(data)
         end
         return applyRot
     end
-
+    
+    -- two items Name, Data in one LMDB entry
     local wnid = string.split(data.Name,'_')[1]
-    local class = config.ImageNetClasses.Wnid2ClassNum[wnid]
+    local class = config.ImageNetClasses.Wnid2ClassNum[wnid]  -- from here we can also get coarse labels
+    -- local class_coarse, class_fine
     local img = data.Data
     if config.Compressed then
         img = image.decompressJPG(img,3,'byte')
@@ -35,7 +39,7 @@ function ExtractFromLMDBTrain(data)
     if math.min(img:size(2), img:size(3)) ~= config.ImageMinSide then
         img = image.scale(img, '^' .. config.ImageMinSide)
     end
-
+    -- Data augementation
     if config.Augment == 3 then
         img = rotate(0.1)(img)
         img = reSample(img)
